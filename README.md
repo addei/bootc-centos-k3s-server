@@ -12,7 +12,7 @@ This project uses multi-stage builds and environment variables for flexible conf
 
 ### 2. Load Variables and Prepare Secret
 
-```sh
+```bash
 set -a
 source k3s.env
 set +a
@@ -22,7 +22,7 @@ echo "$K3S_TOKEN" > k3s_token.txt
 
 ### 3. Build the Image using Podman
 
-```sh
+```bash
 podman build --platform linux/amd64,linux/arm64 --jobs 2 \
 	--secret id=K3S_TOKEN,src=k3s_token.txt \
 	--build-arg INSTALL_K3S_SKIP_DOWNLOAD="$INSTALL_K3S_SKIP_DOWNLOAD" \
@@ -42,6 +42,12 @@ podman build --platform linux/amd64,linux/arm64 --jobs 2 \
 	--build-arg INSTALL_K3S_CHANNEL="$INSTALL_K3S_CHANNEL" \
 	--build-arg K3S_SELINUX="$K3S_SELINUX" \
 	-t k3s-server:$(date +%Y%m%d) .
+```
+
+### 4. Push to registry
+
+```bash
+podman push --all localhost/k3s-server:$(date +%Y%m%d)
 ```
 
 ### Summary
