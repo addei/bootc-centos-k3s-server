@@ -67,4 +67,15 @@ ENV INSTALL_K3S_SKIP_DOWNLOAD=${INSTALL_K3S_SKIP_DOWNLOAD} \
 # Pass the predefined K3S Token as a secret from CICD Variables
 RUN --mount=type=secret,id=K3S_TOKEN K3S_TOKEN=$(cat /run/secrets/K3S_TOKEN) curl -sfL https://get.k3s.io | sh -
 RUN systemctl enable k3s.service
-RUN bootc container lint
+
+# Create entries to tmpfiles.d file
+COPY 70-bootc-k3s-entries.conf /usr/lib/tmpfiles.d/70-bootc-k3s-entries.conf
+
+# Create dhcpcd user and group file entries for sysysers.d
+COPY 70-dhcpcd.conf /usr/lib/sysusers.d/70-dhcpcd.conf
+
+# Clean image
+RUN dnf clean all
+RUN systemd-tmpfiles --clean
+RUN find /var/cache /var/lib/dnf /var/lib/rhsm /var/log /var/roothome/buildinfo -type f -print -delete
+RUN bootc container lint --no-truncate
