@@ -9,9 +9,6 @@ RUN dnf install cloud-init qemu-guest-agent \
     nfs-utils libnfsidmap sssd-nfs-idmap \
     -y
 
-# Clean up DNF cache to reduce image size
-RUN dnf clean packages
-
 # Enable the bootc-fetch-apply-updates timer for OS automatic updates
 RUN systemctl enable bootc-fetch-apply-updates.timer
 
@@ -26,8 +23,10 @@ RUN bootc container lint
 
 FROM base AS k3s-server
 
-# Install SElinux packages for k3s
-RUN dnf install -y https://rpm.rancher.io/k3s/stable/common/centos/9/noarch/
+COPY rancher-k3s-common.repo /etc/yum.repos.d/rancher-k3s-common.repo
+
+# Clean up DNF cache to reduce image size
+RUN dnf clean all
 
 # Declare build arguments for all .env variables
 ARG INSTALL_K3S_SKIP_DOWNLOAD
