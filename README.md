@@ -20,10 +20,10 @@ source k3s-token-secret.env
 echo "$K3S_TOKEN" > k3s_token.txt
 ```
 
-### 3. Build the Image
+### 3. Build the Image using Podman
 
 ```sh
-podman build \
+podman build --platform linux/amd64,linux/arm64 --jobs 2 \
 	--secret id=K3S_TOKEN,src=k3s_token.txt \
 	--build-arg INSTALL_K3S_SKIP_DOWNLOAD="$INSTALL_K3S_SKIP_DOWNLOAD" \
 	--build-arg INSTALL_K3S_SYMLINK="$INSTALL_K3S_SYMLINK" \
@@ -41,7 +41,7 @@ podman build \
 	--build-arg INSTALL_K3S_CHANNEL_URL="$INSTALL_K3S_CHANNEL_URL" \
 	--build-arg INSTALL_K3S_CHANNEL="$INSTALL_K3S_CHANNEL" \
 	--build-arg K3S_SELINUX="$K3S_SELINUX" \
-	-t k3s-server .
+	-t k3s-server:$(date +%Y%m%d) .
 ```
 
 ### Summary
