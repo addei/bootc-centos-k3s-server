@@ -74,6 +74,9 @@ COPY 70-bootc-k3s-entries.conf /usr/lib/tmpfiles.d/70-bootc-k3s-entries.conf
 # Create dhcpcd user and group file entries for sysysers.d
 COPY 70-dhcpcd.conf /usr/lib/sysusers.d/70-dhcpcd.conf
 
+# Copy private registry auth file for bootc upgrades | Note!  Uncomment if required
+# COPY auth.json /etc/ostree/auth.json
+
 # Clean image
 RUN dnf clean all
 RUN systemd-tmpfiles --clean
