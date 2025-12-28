@@ -18,6 +18,10 @@ RUN systemctl enable podman-auto-update.timer
 # Enable Cockpit
 RUN systemctl enable cockpit.socket
 
+# Disable rpm-ostree-countme.timer and rpm-ostree-countme.service
+RUN systemctl disable rpm-ostree-countme.timer
+RUN systemctl disable rpm-ostree-countme.service
+
 # Lint the containerfile
 RUN bootc container lint
 
@@ -63,6 +67,9 @@ ENV INSTALL_K3S_SKIP_DOWNLOAD=${INSTALL_K3S_SKIP_DOWNLOAD} \
     INSTALL_K3S_CHANNEL_URL=${INSTALL_K3S_CHANNEL_URL} \
     INSTALL_K3S_CHANNEL=${INSTALL_K3S_CHANNEL} \
     K3S_SELINUX=${K3S_SELINUX}
+
+# Set SElinux permissive, as k3s does not support EL10 distroes with SELinux
+RUN sed -i 's/^SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 
 # Pass the predefined K3S Token as a secret from CICD Variables
 RUN --mount=type=secret,id=K3S_TOKEN K3S_TOKEN=$(cat /run/secrets/K3S_TOKEN) curl -sfL https://get.k3s.io | sh -
